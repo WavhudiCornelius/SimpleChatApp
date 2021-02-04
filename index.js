@@ -2,6 +2,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const cors = require('cors');
+const mongoose = require('mongoose');
 
 const { addUser, removeUser, getUser, getUsersInRoom } = require('./users');
 
@@ -13,6 +14,21 @@ const io = socketio(server);
 
 app.use(cors());
 app.use(router);
+
+// connecting to the database
+//taking care of all deprecation warnings
+mongoose.set('useNewUrlParser', true);
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
+
+mongoose.connect("mongodb+srv://wavhudi:Corneliu$18@cluster0.8x01x.gcp.mongodb.net/Cluster0?retryWrites=true&w=majority");
+
+const connection = mongoose.connection;
+connection.once('open', () => {
+    console.log("MongoDB database connection established successfully");
+})
+
 
 io.on('connect', (socket) => {
   socket.on('join', ({ name, room }, callback) => {
